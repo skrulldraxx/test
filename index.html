@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            background: white;
+            padding: 50px 60px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .image-placeholder {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            background: transparent;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff69b4;
+            font-size: 14px;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.6), 0 0 50px rgba(255, 182, 193, 0.4);
+        }
+
+        .image-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 20px;
+            display: none;
+        }
+
+        h1 {
+            color: #ff1493;
+            font-size: 32px;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            position: relative;
+            height: 150px;
+            align-items: center;
+            width: 100%;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #yesBtn {
+            background: #ff1493;
+            color: white;
+            transition: all 0.3s ease;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        #yesBtn:hover {
+            background: #ff006e;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        #noBtn {
+            background: #f0f0f0;
+            color: #666;
+            position: absolute;
+            transition: none;
+        }
+
+        #noBtn:hover {
+            background: #e0e0e0;
+        }
+
+        .celebration {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .celebration.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .celebration h2 {
+            color: #ff1493;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .celebration p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hearts, .letter-h {
+            position: fixed;
+            font-size: 30px;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .hearts {
+            animation: floatAndPop 2s ease-out forwards;
+        }
+
+        .letter-h {
+            animation: floatAndPop 2.5s ease-out forwards;
+            font-size: 35px;
+            font-weight: bold;
+            color: #ff1493;
+        }
+
+        @keyframes floatAndPop {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0.5);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-150px) scale(1);
+            }
+            70% {
+                opacity: 1;
+                transform: translateY(-250px) scale(1.2);
+            }
+            85% {
+                opacity: 1;
+                transform: translateY(-300px) scale(1.3);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-350px) scale(0);
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="image-placeholder" id="imagePlaceholder">
+            <img id="valentineImage" src="" alt="Valentine">
+            <span id="placeholderText">Your image will go here</span>
+        </div>
+
+        <h1 id="questionHeading">Can you be my valentine Mellooo?</h1>
+
+        <div class="buttons-container" id="buttonsContainer">
+            <button id="noBtn">No</button>
+            <button id="yesBtn">Yes!</button>
+        </div>
+
+        <div class="celebration" id="celebration">
+            <h2>Yay! 💕</h2>
+            <p>😘🌝</p>
+            <img id="celebrationGif" src="" alt="Celebration" style="margin: 20px auto 0; max-width: 250px; border-radius: 25px; display: none;">
+            <div id="gifPlaceholder" style="margin-top: 20px; padding: 20px; background: #ffe0e6; border-radius: 15px; color: #ff69b4; font-size: 14px; border: 2px dashed #ffb3c6;">
+                Add your celebration GIF here
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const container = document.querySelector('.container');
+        const buttonsContainer = document.getElementById('buttonsContainer');
+        const celebration = document.getElementById('celebration');
+        const questionHeading = document.getElementById('questionHeading');
+
+        // Function to get distance between two points
+        function getDistance(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        }
+
+        // Initialize No button position on the left
+        const containerRect = buttonsContainer.getBoundingClientRect();
+        noBtn.style.left = '20px';
+        noBtn.style.top = '50%';
+        noBtn.style.transform = 'translateY(-50%)';
+
+        // Function to move the No button away from cursor
+        function moveNoButton(e) {
+            const noBtnRect = noBtn.getBoundingClientRect();
+            const btnCenterX = noBtnRect.left + noBtnRect.width / 2;
+            const btnCenterY = noBtnRect.top + noBtnRect.height / 2;
+
+            const distance = getDistance(e.clientX, e.clientY, btnCenterX, btnCenterY);
+
+            // If cursor is within 200px of the button, move it
+            if (distance < 200) {
+                const containerRect = buttonsContainer.getBoundingClientRect();
+
+                // Calculate new random position within the buttons container
+                const maxX = containerRect.width - noBtnRect.width - 40;
+                const maxY = containerRect.height - noBtnRect.height - 20;
+
+                let newX = Math.random() * maxX;
+                let newY = Math.random() * maxY;
+
+                // Make sure it moves far away from the cursor
+                const potentialX = containerRect.left + newX + noBtnRect.width / 2;
+                const potentialY = containerRect.top + newY + noBtnRect.height / 2;
+                const newDistance = getDistance(e.clientX, e.clientY, potentialX, potentialY);
+
+                // If new position is still too close, move to opposite side
+                if (newDistance < 150) {
+                    if (e.clientX < containerRect.left + containerRect.width / 2) {
+                        newX = containerRect.width - noBtnRect.width - 40;
+                    } else {
+                        newX = 20;
+                    }
+                }
+
+                noBtn.style.left = `${newX}px`;
+                noBtn.style.top = `${newY}px`;
+                noBtn.style.transform = 'none';
+            }
+        }
+
+        // Add mousemove listener
+        document.addEventListener('mousemove', moveNoButton);
+
+        // Yes button click handler
+        yesBtn.addEventListener('click', () => {
+            questionHeading.style.display = 'none';
+            buttonsContainer.style.display = 'none';
+            celebration.classList.add('show');
+            createHearts();
+
+            // Change the image to the new one
+            img.src = 'Gemini_Generated_Image_r832mrr832mrr832.png';
+        });
+
+        // Create floating hearts and H letters animation
+        function createHearts() {
+            const totalElements = 40; // More elements for a fuller effect
+
+            for (let i = 0; i < totalElements; i++) {
+                setTimeout(() => {
+                    // Randomly choose between heart and letter H
+                    const isHeart = Math.random() > 0.3; // 70% hearts, 30% H letters
+
+                    const element = document.createElement('div');
+                    element.className = isHeart ? 'hearts' : 'letter-h';
+                    element.textContent = isHeart ? '💕' : 'H';
+                    element.style.left = Math.random() * window.innerWidth + 'px';
+                    element.style.top = (window.innerHeight - 50) + 'px';
+                    document.body.appendChild(element);
+
+                    // Remove element after animation completes
+                    setTimeout(() => {
+                        element.remove();
+                    }, 2500);
+                }, i * 150);
+            }
+        }
+
+        // Load celebration GIF automatically
+        const celebrationGif = document.getElementById('celebrationGif');
+        const gifPlaceholder = document.getElementById('gifPlaceholder');
+        celebrationGif.src = 'celebration.gif'; // Make sure to save your GIF as 'celebration.gif' in the same folder
+        celebrationGif.onload = function() {
+            celebrationGif.style.display = 'block';
+            gifPlaceholder.style.display = 'none';
+        };
+
+        // Load the main image
+        const img = document.getElementById('valentineImage');
+        const placeholder = document.getElementById('placeholderText');
+        img.src = 'unnamed.jpg';
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+    </script>
+</body>
+</html>
